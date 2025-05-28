@@ -1,0 +1,73 @@
+<div class="prefill-step-container">
+  <h2>Prefill E-Filing Data</h2>
+  
+  <p class="step-description">
+    Configure how you want to prefill the e-filing data for {{ records.length }} selected record(s).
+    {{ userType === 'taxAgent' ? 'As a tax agent, you can customize prefill options for batch processing.' : '' }}
+  </p>
+  
+  <div class="prefill-form-container">
+    <form [formGroup]="prefillForm">
+      <h3>Prefill Options</h3>
+      
+      <div class="form-field">
+        <label>Prefill Method:</label>
+        <mat-radio-group formControlName="prefillMethod">
+          <mat-radio-button *ngFor="let option of prefillOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+      
+      <div class="form-field">
+        <mat-checkbox formControlName="includeAttachments">
+          Include attachments
+        </mat-checkbox>
+      </div>
+      
+      <div class="form-field">
+        <mat-checkbox formControlName="overwriteExisting">
+          Overwrite existing data
+        </mat-checkbox>
+      </div>
+      
+      <div class="form-actions" *ngIf="!isLoading && !prefillComplete">
+        <button mat-raised-button color="primary" (click)="startPrefill()">
+          Start Prefill
+        </button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="prefill-progress" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Prefilling data for {{ records.length }} record(s)...</p>
+  </div>
+  
+  <div class="prefill-complete" *ngIf="prefillComplete">
+    <mat-icon color="primary">check_circle</mat-icon>
+    <p>Prefill completed successfully for {{ records.length }} record(s).</p>
+    
+    <div class="records-summary">
+      <h3>Records Summary</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Entity Name</th>
+            <th>Return Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of records">
+            <td>{{ record.entityName }}</td>
+            <td>{{ record.returnName }}</td>
+            <td>
+              <span class="status-badge">Ready for validation</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

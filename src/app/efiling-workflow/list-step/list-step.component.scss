@@ -1,0 +1,27 @@
+.list-step-container {
+  padding: 16px;
+  
+  h2 {
+    margin-bottom: 16px;
+  }
+  
+  .step-description {
+    margin-bottom: 24px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .records-table-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    
+    .records-table {
+      width: 100%;
+    }
+  }
+  
+  .selection-summary {
+    margin-top: 16px;
+    font-weight: 500;
+  }
+}

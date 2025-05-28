@@ -1,0 +1,73 @@
+<div class="list-step-container">
+  <h2>Select Records for E-Filing</h2>
+  
+  <p class="step-description">
+    Select the records you want to include in this e-filing submission.
+    {{ userType === 'taxAgent' ? 'As a tax agent, you can select multiple records for batch processing.' : '' }}
+  </p>
+  
+  <div class="records-table-container">
+    <table mat-table [dataSource]="records" class="records-table">
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox 
+            (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+            [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      
+      <!-- Dataset Column -->
+      <ng-container matColumnDef="dataset">
+        <th mat-header-cell *matHeaderCellDef>Dataset</th>
+        <td mat-cell *matCellDef="let element">{{element.dataset}}</td>
+      </ng-container>
+      
+      <!-- Jurisdiction Column -->
+      <ng-container matColumnDef="jurisdiction">
+        <th mat-header-cell *matHeaderCellDef>Jurisdiction</th>
+        <td mat-cell *matCellDef="let element">{{element.jurisdiction}}</td>
+      </ng-container>
+      
+      <!-- Entity Name Column -->
+      <ng-container matColumnDef="entityName">
+        <th mat-header-cell *matHeaderCellDef>Entity Name</th>
+        <td mat-cell *matCellDef="let element">{{element.entityName}}</td>
+      </ng-container>
+      
+      <!-- Return Name Column -->
+      <ng-container matColumnDef="returnName">
+        <th mat-header-cell *matHeaderCellDef>Return Name</th>
+        <td mat-cell *matCellDef="let element">{{element.returnName}}</td>
+      </ng-container>
+      
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let element">{{element.status}}</td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr 
+        mat-row 
+        *matRowDef="let row; columns: displayedColumns;"
+        (click)="selection.toggle(row)">
+      </tr>
+    </table>
+  </div>
+  
+  <div class="selection-summary">
+    <span>{{ selection.selected.length }} of {{ records.length }} records selected</span>
+  </div>
+</div>

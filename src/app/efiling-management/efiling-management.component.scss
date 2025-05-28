@@ -1,0 +1,46 @@
+.efiling-management-container {
+  padding: 20px;
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  .selection-info {
+    margin-bottom: 16px;
+    font-weight: 500;
+    color: #1976d2;
+  }
+  
+  .grid-container {
+    height: 600px;
+    width: 100%;
+    margin-bottom: 20px;
+    
+    ag-grid-angular {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  
+  .mat-icon-button {
+    min-width: 0;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    line-height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+    
+    .material-icons {
+      font-size: 20px;
+      line-height: 36px;
+    }
+  }
+}

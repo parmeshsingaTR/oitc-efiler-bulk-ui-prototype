@@ -1,0 +1,97 @@
+<div class="confirmation-step-container">
+  <h2>E-Filing Confirmation</h2>
+  
+  <div class="confirmation-content">
+    <div class="confirmation-header">
+      <mat-icon color="primary">check_circle</mat-icon>
+      <h3>E-Filing Submission Complete</h3>
+      <p>Your e-filing submission has been processed. Please save this confirmation for your records.</p>
+    </div>
+    
+    <div class="confirmation-details">
+      <div class="detail-row">
+        <span class="label">Submission Date:</span>
+        <span class="value">{{ filingResults?.timestamp | date:'medium' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Submitted By:</span>
+        <span class="value">{{ userType === 'taxAgent' ? 'Tax Agent' : 'Corporate User' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Total Records:</span>
+        <span class="value">{{ filingResults?.results?.length || 0 }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Successful:</span>
+        <span class="value">{{ filingResults?.results?.filter(r => r.status === 'success').length || 0 }}</span>
+      </div>
+      <div class="detail-row" *ngIf="!filingResults?.allSuccessful">
+        <span class="label">Failed:</span>
+        <span class="value">{{ filingResults?.results?.filter(r => r.status === 'failed').length || 0 }}</span>
+      </div>
+    </div>
+    
+    <div class="results-table-container">
+      <h4>Filing Results</h4>
+      <table mat-table [dataSource]="filingResults?.results || []" class="confirmation-table">
+        <!-- Entity Name Column -->
+        <ng-container matColumnDef="entityName">
+          <th mat-header-cell *matHeaderCellDef>Entity Name</th>
+          <td mat-cell *matCellDef="let element">{{element.entityName}}</td>
+        </ng-container>
+        
+        <!-- Return Name Column -->
+        <ng-container matColumnDef="returnName">
+          <th mat-header-cell *matHeaderCellDef>Return Name</th>
+          <td mat-cell *matCellDef="let element">{{element.returnName}}</td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="status-indicator" [ngClass]="element.status">
+              <mat-icon *ngIf="element.status === 'success'">check_circle</mat-icon>
+              <mat-icon *ngIf="element.status === 'failed'">error</mat-icon>
+              <span>{{ element.status | titlecase }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Reference Number Column -->
+        <ng-container matColumnDef="referenceNumber">
+          <th mat-header-cell *matHeaderCellDef>Reference Number</th>
+          <td mat-cell *matCellDef="let element">{{ element.referenceNumber || '-' }}</td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr 
+          mat-row 
+          *matRowDef="let row; columns: displayedColumns;"
+          [ngClass]="{'success-row': row.status === 'success', 'error-row': row.status === 'failed'}">
+        </tr>
+      </table>
+    </div>
+    
+    <div class="next-steps">
+      <h4>Next Steps</h4>
+      <ul>
+        <li>Save or print this confirmation for your records.</li>
+        <li>You will receive an email confirmation at your registered email address.</li>
+        <li>Track the status of your filing in the E-Filing Management dashboard.</li>
+        <li *ngIf="!filingResults?.allSuccessful">For failed submissions, please review the errors and resubmit.</li>
+      </ul>
+    </div>
+    
+    <div class="confirmation-actions">
+      <button mat-raised-button color="primary" (click)="downloadReceipt()">
+        <mat-icon>download</mat-icon>
+        Download Receipt
+      </button>
+      <button mat-button (click)="printConfirmation()">
+        <mat-icon>print</mat-icon>
+        Print
+      </button>
+    </div>
+  </div>
+</div>

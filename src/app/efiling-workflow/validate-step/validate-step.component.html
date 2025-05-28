@@ -1,0 +1,99 @@
+<div class="validate-step-container">
+  <h2>Validate E-Filing Data</h2>
+  
+  <p class="step-description">
+    Validating e-filing data for {{ records.length }} selected record(s).
+    {{ userType === 'taxAgent' ? 'As a tax agent, you can review and fix validation issues before proceeding.' : '' }}
+  </p>
+  
+  <div class="validation-progress" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Validating data for {{ records.length }} record(s)...</p>
+  </div>
+  
+  <div class="validation-results" *ngIf="validationComplete">
+    <div class="validation-summary">
+      <div class="summary-item" [class.success]="allValid()">
+        <mat-icon>{{ allValid() ? 'check_circle' : 'warning' }}</mat-icon>
+        <span>{{ allValid() ? 'All records passed validation' : 'Some records have validation issues' }}</span>
+      </div>
+    </div>
+    
+    <table mat-table [dataSource]="validationResults" class="validation-table">
+      <!-- Entity Name Column -->
+      <ng-container matColumnDef="entityName">
+        <th mat-header-cell *matHeaderCellDef>Entity Name</th>
+        <td mat-cell *matCellDef="let element">{{element.entityName}}</td>
+      </ng-container>
+      
+      <!-- Return Name Column -->
+      <ng-container matColumnDef="returnName">
+        <th mat-header-cell *matHeaderCellDef>Return Name</th>
+        <td mat-cell *matCellDef="let element">{{element.returnName}}</td>
+      </ng-container>
+      
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="status-indicator" [ngClass]="element.status">
+            <mat-icon *ngIf="element.status === 'valid'">check_circle</mat-icon>
+            <mat-icon *ngIf="element.status === 'warning'">warning</mat-icon>
+            <mat-icon *ngIf="element.status === 'error'">error</mat-icon>
+            <span>{{ element.status | titlecase }}</span>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let element">
+          <button 
+            mat-button 
+            color="primary" 
+            *ngIf="element.status !== 'valid'"
+            (click)="fixValidationIssue(element)">
+            Fix Issues
+          </button>
+          <button 
+            mat-button 
+            *ngIf="element.status !== 'valid'"
+            [matMenuTriggerFor]="messageMenu">
+            View Details
+          </button>
+          <mat-menu #messageMenu="matMenu">
+            <div class="message-menu-content">
+              <h4>Validation Messages</h4>
+              <div class="validation-message" *ngFor="let msg of element.messages" [ngClass]="msg.type">
+                <strong>{{ msg.code }}:</strong> {{ msg.message }}
+              </div>
+            </div>
+          </mat-menu>
+        </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr 
+        mat-row 
+        *matRowDef="let row; columns: displayedColumns;"
+        [ngClass]="{'error-row': row.status === 'error', 'warning-row': row.status === 'warning'}">
+      </tr>
+    </table>
+    
+    <div class="validation-actions" *ngIf="validationComplete">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        [disabled]="hasErrors()"
+        (click)="onNext()">
+        Continue to Filing
+      </button>
+      <button 
+        mat-button 
+        (click)="startValidation()">
+        Revalidate
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="efiling-workflow-container">
+  <mat-horizontal-stepper [linear]="true" #stepper>
+    <mat-step *ngFor="let step of workflowState.steps" [completed]="step.completed" [editable]="!workflowState.automaticMode">
+      <ng-template matStepLabel>{{ step.name }}</ng-template>
+      
+      <!-- List Step -->
+      <app-list-step 
+        *ngIf="currentStep.id === 'list'"
+        [records]="workflowState.selectedRecords"
+        [userType]="workflowState.userType"
+        (next)="onNextStep($event)"
+        (cancel)="onCancel()">
+      </app-list-step>
+      
+      <!-- Prefill Step -->
+      <app-prefill-step 
+        *ngIf="currentStep.id === 'prefill'"
+        [records]="workflowState.selectedRecords"
+        [userType]="workflowState.userType"
+        (next)="onNextStep($event)"
+        (previous)="onPreviousStep()"
+        (cancel)="onCancel()">
+      </app-prefill-step>
+      
+      <!-- Validate Step -->
+      <app-validate-step 
+        *ngIf="currentStep.id === 'validate'"
+        [records]="workflowState.selectedRecords"
+        [prefillData]="workflowService.getStepData('prefill')"
+        [userType]="workflowState.userType"
+        (next)="onNextStep($event)"
+        (previous)="onPreviousStep()"
+        (cancel)="onCancel()">
+      </app-validate-step>
+      
+      <!-- File Step -->
+      <app-file-step 
+        *ngIf="currentStep.id === 'file'"
+        [records]="workflowState.selectedRecords"
+        [validationData]="workflowService.getStepData('validate')"
+        [userType]="workflowState.userType"
+        (next)="onNextStep($event)"
+        (previous)="onPreviousStep()"
+        (cancel)="onCancel()">
+      </app-file-step>
+      
+      <!-- Confirmation Step -->
+      <app-confirmation-step 
+        *ngIf="currentStep.id === 'confirmation'"
+        [filingResults]="workflowService.getStepData('file')"
+        [userType]="workflowState.userType"
+        (complete)="onComplete($event)"
+        (previous)="onPreviousStep()"
+        (cancel)="onCancel()">
+      </app-confirmation-step>
+    </mat-step>
+  </mat-horizontal-stepper>
+  
+  <div class="workflow-controls">
+    <mat-checkbox 
+      [checked]="workflowState.automaticMode"
+      (change)="setAutomaticMode($event.checked)"
+      [disabled]="currentStep.id !== 'list'">
+      Run automatically
+    </mat-checkbox>
+    
+    <div class="workflow-buttons">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="onPreviousStep()" [disabled]="isFirstStep() || workflowState.automaticMode">Previous</button>
+      <button mat-raised-button color="primary" (click)="onNextStep()" [disabled]="workflowState.automaticMode">
+        {{ isLastStep() ? 'Finish' : 'Next' }}
+      </button>
+    </div>
+  </div>
+</div>

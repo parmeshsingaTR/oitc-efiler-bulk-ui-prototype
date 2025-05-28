@@ -1,0 +1,34 @@
+<div class="efiling-management-container">
+  <h2>E-Filing Management</h2>
+
+  <div class="selection-info" *ngIf="selection.selected.length > 0">
+    {{ selection.selected.length }} records selected
+  </div>
+
+  <div class="grid-container">
+    <ag-grid-angular
+      class="ag-theme-material"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [rowSelection]="'multiple'"
+      [suppressRowClickSelection]="true"
+      (gridReady)="onGridReady($event)"
+      domLayout="autoHeight"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <div style="position: absolute; top: -1000px; left: -1000px">
+    <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="actionMenu"></div>
+  </div>
+
+  <mat-menu #actionMenu="matMenu">
+    <ng-template matMenuContent>
+      <button mat-menu-item *ngFor="let item of actionMenuItems" (click)="onActionClick(item.action)">
+        <mat-icon>{{item.icon}}</mat-icon>
+        <span>{{item.label}}</span>
+      </button>
+    </ng-template>
+  </mat-menu>
+</div>
