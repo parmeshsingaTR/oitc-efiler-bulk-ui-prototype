@@ -35,6 +35,7 @@ import { ConfirmationStepComponent } from './efiling-workflow/confirmation-step/
 
 // Services
 import { WorkflowService } from './services/workflow.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const materialModules = [
   MatButtonModule,
@@ -63,7 +64,8 @@ const materialModules = [
     PrefillStepComponent,
     ValidateStepComponent,
     FileStepComponent,
-    ConfirmationStepComponent
+    ConfirmationStepComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

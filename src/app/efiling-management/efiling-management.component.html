@@ -1,34 +1,93 @@
 <div class="efiling-management-container">
-  <h2>E-Filing Management</h2>
-
-  <div class="selection-info" *ngIf="selection.selected.length > 0">
-    {{ selection.selected.length }} records selected
-  </div>
-
-  <div class="grid-container">
-    <ag-grid-angular
-      class="ag-theme-material"
-      [rowData]="rowData"
-      [columnDefs]="columnDefs"
-      [defaultColDef]="defaultColDef"
-      [rowSelection]="'multiple'"
-      [suppressRowClickSelection]="true"
-      (gridReady)="onGridReady($event)"
-      domLayout="autoHeight"
-    >
-    </ag-grid-angular>
-  </div>
-
-  <div style="position: absolute; top: -1000px; left: -1000px">
-    <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="actionMenu"></div>
-  </div>
-
-  <mat-menu #actionMenu="matMenu">
-    <ng-template matMenuContent>
-      <button mat-menu-item *ngFor="let item of actionMenuItems" (click)="onActionClick(item.action)">
-        <mat-icon>{{item.icon}}</mat-icon>
-        <span>{{item.label}}</span>
+<div class="header">
+    <button mat-icon-button class="menu-toggle">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="brand">
+      <div class="thomson-reuters">THOMSON REUTERS</div>
+      <div class="e-filing-title">E-FILING MANAGEMENT</div>
+    </div>
+    <div class="header-icons">
+      <button mat-icon-button routerLink="/dashboard">
+        <mat-icon>home</mat-icon>
       </button>
-    </ng-template>
+      <button mat-icon-button>
+        <mat-icon>description</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>chat</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>help</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>info</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="selection-info" *ngIf="selection.selected.length > 0">
+      {{ selection.selected.length }} records selected
+    </div>
+
+    <div class="grid-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="checkbox-column">
+              <mat-checkbox (change)="masterToggle()" [checked]="isAllSelected()"></mat-checkbox>
+            </th>
+            <th class="actions-column">Actions</th>
+            <th>Dataset</th>
+            <th>Jurisdiction</th>
+            <th>Entity Name</th>
+            <th>Return Name</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>No Auto Rollforward</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rowData">
+            <td class="checkbox-column">
+              <mat-checkbox 
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)">
+              </mat-checkbox>
+            </td>
+            <td class="actions-column">
+              <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="selectedRow = row">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </td>
+            <td>{{ row.dataset }}</td>
+            <td>{{ row.jurisdiction }}</td>
+            <td>{{ row.entityName }}</td>
+            <td>{{ row.returnName }}</td>
+            <td>{{ row.purpose }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.noAutoRollforward }}</td>
+            <td>{{ row.startDate }}</td>
+            <td>{{ row.endDate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <mat-menu #rowMenu="matMenu">
+    <button mat-menu-item *ngFor="let item of actionMenuItems" (click)="onActionClick(item.action)">
+      <mat-icon>{{item.icon}}</mat-icon>
+      <span>{{item.label}}</span>
+    </button>
   </mat-menu>
 </div>
