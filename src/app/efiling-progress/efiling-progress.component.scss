@@ -1,0 +1,98 @@
+.efiling-progress-container {
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  p {
+    font-size: 16px;
+    color: #666;
+  }
+  .grid-container {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    overflow: auto;
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      th, td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        white-space: nowrap;
+      }
+
+      th {
+        font-weight: 500;
+        color: #757575;
+        font-size: 13px;
+        background-color: #fafafa;
+      }
+
+      td {
+        font-size: 14px;
+        color: #333;
+      }
+
+      tr:hover td {
+        background-color: #f5f5f5;
+      }
+
+      .checkbox-column {
+        width: 48px;
+        text-align: center;
+        padding: 0 8px;
+      }
+
+      .actions-column {
+        width: 72px;
+        text-align: center;
+      }
+
+      // Progress bar styling
+      .progress-cell {
+        width: 120px;
+        padding: 12px 16px;
+      }
+
+      mat-progress-bar {
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      // Color the progress bar based on progress value
+      ::ng-deep {
+        // Default progress bar styling
+        .mat-progress-bar {
+          border: 1px solid #ddd;
+        }
+        
+        .mat-progress-bar-buffer {
+          background-color: #e0e0e0;
+        }
+        
+        // Normal progress bar (green)
+        .normal-progress .mat-progress-bar-fill::after {
+          background-color: #4caf50; // Green for normal progress
+        }
+        
+        // Failed progress bar (red)
+        .failed-progress .mat-progress-bar-fill::after {
+          background-color: #f44336; // Red for failed progress
+        }
+      }
+      
+      // Status styling
+      .status-failed {
+        color: #f44336;
+        font-weight: bold;
+      }
+    }
+  }
+}

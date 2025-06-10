@@ -1,3 +1,11 @@
+<nav class="menu">
+  <ul>
+    <li><a routerLink="/dashboard">Dashboard</a></li>
+    <li><a routerLink="/efiling-management">E-Filing Management</a></li>
+    <li><a routerLink="/returns">Returns</a></li>
+    <li><a routerLink="/settings">Settings</a></li>
+  </ul>
+</nav>
 <div class="efiling-workflow-container">
   <mat-horizontal-stepper [linear]="true" #stepper>
     <mat-step *ngFor="let step of workflowState.steps" [completed]="step.completed" [editable]="!workflowState.automaticMode">

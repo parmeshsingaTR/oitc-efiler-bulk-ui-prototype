@@ -6,6 +6,7 @@ import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { EfilingRecord, MOCK_DATA, ACTION_MENU_ITEMS } from '../models/efiling.model';
 import { WorkflowService } from '../services/workflow.service';
 import { EfilingWorkflowComponent } from '../efiling-workflow/efiling-workflow.component';
+import { EfilingWizardComponent } from '../efiling-wizard/efiling-wizard.component';
 import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
@@ -52,7 +53,7 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
     { field: 'endDate', headerName: 'End Date', sortable: true, filter: true },
     { field: 'period', headerName: 'Period', sortable: true, filter: true },
     { field: 'templateVersion', headerName: 'Template Version', sortable: true, filter: true },
-    { field: 'eFilingStatus', headerName: 'E-Filing Status', sortable: true, filter: true },
+    { field: 'efileStatus', headerName: 'E-Filing Status', sortable: true, filter: true },
     { field: 'prevEfilingAction', headerName: 'Previous E-Filing Action', sortable: true, filter: true },
     { field: 'templateName', headerName: 'Template Name', sortable: true, filter: true }
   ];
@@ -72,6 +73,11 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
     // Initialize rowData with mock data
     console.log('Mock data:', MOCK_DATA);
     this.rowData = [...MOCK_DATA];
+    
+    // Set all efileStatus values to "Not Sent"
+    this.rowData.forEach(record => {
+      record.efileStatus = 'Not Sent';
+    });
   }
 
   ngAfterViewInit(): void {
@@ -185,18 +191,16 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
       // Process single record (the one that was right-clicked)
       if (!this.selectedRow) return;
       
-      // Initialize the workflow with the selected record
-      this.workflowService.initializeWorkflow(
-        [this.selectedRow], 
-        'corporate', 
-        false
-      );
-      
-      // Open the workflow dialog
-      const dialogRef = this.dialog.open(EfilingWorkflowComponent, {
-        width: '800px',
-        height: '600px',
-        disableClose: true
+      // Open the new e-filing wizard dialog
+      const dialogRef = this.dialog.open(EfilingWizardComponent, {
+        width: '650px',
+        height: '450px',
+        disableClose: true,
+        data: {
+          records: [this.selectedRow],
+          entityType: 'corporate',
+          isBulk: false
+        }
       });
       
       dialogRef.afterClosed().subscribe(result => {
@@ -204,7 +208,7 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
           // Update the record status
           const index = this.rowData.findIndex(r => r.dataset === this.selectedRow?.dataset);
           if (index !== -1) {
-            this.rowData[index].eFilingStatus = 'Filed';
+            this.rowData[index].efileStatus = result.status || 'Filed';
             this.rowData[index].prevEfilingAction = 'E-Filed on ' + new Date().toLocaleDateString();
             this.gridApi.setRowData([...this.rowData]);
           }
@@ -215,18 +219,16 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
 
   // Process multiple selected records
   private processMultipleRecords() {
-    // Initialize the workflow with all selected records
-    this.workflowService.initializeWorkflow(
-      this.selection.selected, 
-      'corporate', 
-      false
-    );
-    
-    // Open the workflow dialog
-    const dialogRef = this.dialog.open(EfilingWorkflowComponent, {
-      width: '800px',
-      height: '600px',
-      disableClose: true
+    // Open the new e-filing wizard dialog for multiple records
+    const dialogRef = this.dialog.open(EfilingWizardComponent, {
+      width: '650px',
+      height: '450px',
+      disableClose: true,
+      data: {
+        records: this.selection.selected,
+        entityType: 'corporate',
+        isBulk: true
+      }
     });
     
     dialogRef.afterClosed().subscribe(result => {
@@ -235,7 +237,7 @@ export class EfilingManagementComponent implements OnInit, AfterViewInit {
         this.selection.selected.forEach(selectedRecord => {
           const index = this.rowData.findIndex(r => r.dataset === selectedRecord.dataset);
           if (index !== -1) {
-            this.rowData[index].eFilingStatus = 'Filed';
+            this.rowData[index].efileStatus = result.status || 'Filed';
             this.rowData[index].prevEfilingAction = 'E-Filed on ' + new Date().toLocaleDateString();
           }
         });

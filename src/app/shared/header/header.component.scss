@@ -1,0 +1,38 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  background-color: #000;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.menu-toggle button {
+  margin-right: 10px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.thomson-reuters {
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+}
+
+.onesource {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ff6600; // Orange color
+}
+
+.header-icons {
+  display: flex;
+  gap: 8px;
+}

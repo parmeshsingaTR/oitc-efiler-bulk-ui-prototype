@@ -1,134 +1,118 @@
 .efiling-management-container {
- /* display: flex;
-  flex-direction: column;
-  height: 100vh;
-  font-family: 'Roboto', sans-serif;
-  background-color: #f5f5f5;*/
-  display: flex
-;
-    flex-direction: column;
-    height: 100%;
+  .menu {
+    background-color: #404040;
     color: white;
-    position: relative;
-    z-index: 1;
-    padding: 20px;
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    height: 60px;
-    background-color: #000;
-    color: white;
+    padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-    
-    .menu-toggle {
-      margin-right: 15px;
-    }
-    
-    .brand {
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-    }
-    
-    .thomson-reuters {
-      font-size: 14px;
-      font-weight: 400;
-      color: white;
-    }
-    
-    .e-filing-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ff6600 !important;
-    }
-    
-    .header-icons {
-      display: flex;
-      gap: 8px;
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+      li {
+        position: relative;
+        a {
+          text-decoration: none;
+          color: white;
+          font-size: 16px;
+          font-weight: 500;
+          padding: 10px 15px;
+          background-color: #404040;
+          border-radius: 4px;
+          transition: background-color 0.3s, color 0.3s;
+          &:hover {
+            background-color: #ff6600; // Orange color
+            color: white;
+          }
+        }
+          .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #404040;
+            padding: 10px;
+            width: 200px; /* Increased width */
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          border-radius: 4px;
+          li {
+            margin-bottom: 8px;
+            a {
+              font-size: 14px;
+              font-weight: 400;
+              padding: 10px 15px;
+              &:hover {
+                background-color: #ff6600; // Orange color
+                color: white;
+              }
+            }
+          }
+        }
+        &:hover .submenu {
+          display: block;
+        }
+      }
     }
   }
-  
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: white;
+  position: relative;
+  z-index: 1;
+
   .content-wrapper {
     padding: 24px;
     flex: 1;
     overflow: auto;
   }
-  
-  .selection-info {
-    margin-bottom: 16px;
-    font-weight: 500;
-    color: #1976d2;
-  }
-  
+
   .grid-container {
     background-color: white;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     overflow: auto;
-    
+
     .data-table {
       width: 100%;
       border-collapse: collapse;
-      
+
       th, td {
         padding: 12px 16px;
         text-align: left;
         border-bottom: 1px solid #e0e0e0;
         white-space: nowrap;
       }
-      
+
       th {
         font-weight: 500;
         color: #757575;
         font-size: 13px;
         background-color: #fafafa;
       }
-      
+
       td {
         font-size: 14px;
         color: #333;
       }
-      
+
       tr:hover td {
         background-color: #f5f5f5;
       }
-      
+
       .checkbox-column {
         width: 48px;
         text-align: center;
         padding: 0 8px;
       }
-      
+
       .actions-column {
         width: 72px;
         text-align: center;
       }
-    }
-  }
-  
-  .mat-icon-button {
-    min-width: 0;
-    padding: 0;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    line-height: 36px;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
-    
-    .material-icons {
-      font-size: 20px;
-      line-height: 36px;
     }
   }
 }
