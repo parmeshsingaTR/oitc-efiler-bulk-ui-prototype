@@ -1,0 +1,112 @@
+<div class="efiling-wizard-container">
+  <!-- Step indicator -->
+  <div class="step-indicator">
+    <div class="step-navigation">
+      <button class="nav-button prev" (click)="previousStep()" [disabled]="currentStep === 1">
+        <span class="arrow">&#10094;</span>
+      </button>
+    </div>
+    
+    <div class="steps">
+      <div class="step-item" [ngClass]="{'active': currentStep === 1, 'completed': currentStep > 1}">
+        <div class="step-number">1</div>
+        <div class="step-title">{{ stepTitles[0] }}</div>
+      </div>
+      
+      <div class="step-item" [ngClass]="{'active': currentStep === 2, 'completed': currentStep > 2}">
+        <div class="step-number">2</div>
+        <div class="step-title">{{ stepTitles[1] }}</div>
+      </div>
+      
+      <div class="step-item" [ngClass]="{'active': currentStep === 3}">
+        <div class="step-number">3</div>
+        <div class="step-title">{{ stepTitles[2] }}</div>
+      </div>
+    </div>
+    
+    <div class="step-navigation">
+      <button class="nav-button next" (click)="nextStep()" [disabled]="currentStep === totalSteps">
+        <span class="arrow">&#10095;</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Step content -->
+  <div class="step-content">
+    <!-- Step 1: Filings -->
+    <div *ngIf="currentStep === 1" class="step-content-inner">
+      <div class="info-row">
+        <div class="label">Previous Action:</div>
+        <div class="value">{{ previousAction }}</div>
+      </div>
+      
+      <div class="info-row">
+        <div class="label">E-Filing Status:</div>
+        <div class="value">{{ efilingStatus }}</div>
+      </div>
+      
+      <div class="option-row">
+        <label class="radio-container">
+          <input type="radio" name="filingType" [(ngModel)]="selectedFilingType" value="Business Activity Statement">
+          <span class="radio-label">Business Activity Statement</span>
+        </label>
+      </div>
+      
+      <div class="button-row">
+        <div class="action-buttons">
+          <button class="btn-next" (click)="nextStep()">Next</button>
+          <button class="btn-cancel" (click)="closeDialog()">Cancel</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2: Actions -->
+    <div *ngIf="currentStep === 2" class="step-content-inner">
+      <div class="info-row">
+        <div class="label">E-Filing Status:</div>
+        <div class="value">{{ efilingStatus }}</div>
+      </div>
+      
+      <div class="option-row">
+        <label class="radio-container">
+          <input type="radio" name="action" [(ngModel)]="selectedAction" value="List" (change)="onActionChange()">
+          <span class="radio-label">Manual (List)</span>
+        </label>
+      </div>
+      
+      <div class="option-row">
+        <label class="radio-container">
+          <input type="radio" name="action" [(ngModel)]="selectedAction" value="AutoComplete" (change)="onActionChange()">
+          <span class="radio-label">Auto Complete</span>
+        </label>
+      </div>
+      
+      <div class="button-row">
+        <div class="action-buttons">
+          <button class="btn-prev" (click)="previousStep()">Previous</button>
+          <button class="btn-next" (click)="nextStep()">Next</button>
+          <button class="btn-cancel" (click)="closeDialog()">Cancel</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 3: Status -->
+    <div *ngIf="currentStep === 3" class="step-content-inner">
+      <div *ngIf="filingComplete" class="success-message">
+        {{ successMessage }}
+      </div>
+      
+      <div class="info-row">
+        <div class="label">E-Filing Status:</div>
+        <div class="value">{{ efilingStatus }}</div>
+      </div>
+      
+      <div class="button-row">
+        <div class="action-buttons">
+          <button class="btn-refresh" (click)="refreshStatus()">Refresh Status</button>
+          <button class="btn-ok" (click)="closeDialog(true)">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

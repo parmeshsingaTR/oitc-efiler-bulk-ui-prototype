@@ -1,0 +1,97 @@
+<div class="efiling-progress-container">
+  <h1>E-file Progress</h1>
+  <mat-tab-group>
+    <mat-tab label="In Progress">
+      <div class="grid-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="checkbox-column">
+                <mat-checkbox></mat-checkbox>
+              </th>
+              <th class="actions-column">Actions</th>
+              <th>Efie-Progress</th>
+              <th>Efile-status</th>
+              <th>Dataset</th>
+              <th>Jurisdiction</th>
+              <th>Entity Name</th>
+              <th>Return Name</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of inProgressRecords">
+              <td class="checkbox-column">
+                <mat-checkbox></mat-checkbox>
+              </td>
+              <td class="actions-column">
+                <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="selectedRow = record">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </td>
+              <td class="progress-cell">
+                <mat-progress-bar 
+                  mode="determinate" 
+                  [value]="getProgressValue(record.efileProgress, record.dataset)"
+                  [ngClass]="getProgressBarClass(record.dataset, getProgressValue(record.efileProgress, record.dataset))">
+                </mat-progress-bar>
+              </td>
+              <td>{{ record.efileStatus }}</td>
+              <td>{{ record.dataset }}</td>
+              <td>{{ record.jurisdiction }}</td>
+              <td>{{ record.entityName }}</td>
+              <td>{{ record.returnName }}</td>
+              <td>{{ record.startDate }}</td>
+              <td>{{ record.endDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="Completed">
+      <div class="grid-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="checkbox-column">
+                <mat-checkbox></mat-checkbox>
+              </th>
+              <th>Efile-status</th>
+              <th>Dataset</th>
+              <th>Jurisdiction</th>
+              <th>Entity Name</th>
+              <th>Return Name</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of completedRecords">
+              <td class="checkbox-column">
+                <mat-checkbox></mat-checkbox>
+              </td>
+              <td>{{ record.efileStatus }}</td>
+              <td>{{ record.dataset }}</td>
+              <td>{{ record.jurisdiction }}</td>
+              <td>{{ record.entityName }}</td>
+              <td>{{ record.returnName }}</td>
+              <td>{{ record.startDate }}</td>
+              <td>{{ record.endDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+  
+  <!-- Action menu -->
+  <mat-menu #rowMenu="matMenu">
+    <ng-template matMenuContent>
+      <button mat-menu-item *ngFor="let item of actionMenuItems" (click)="onActionClick(item.action)">
+        <mat-icon>{{item.icon}}</mat-icon>
+        <span>{{item.label}}</span>
+      </button>
+    </ng-template>
+  </mat-menu>
+</div>

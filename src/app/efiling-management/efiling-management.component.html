@@ -1,36 +1,21 @@
 <div class="efiling-management-container">
-<div class="header">
-    <button mat-icon-button class="menu-toggle">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <div class="brand">
-      <div class="thomson-reuters">THOMSON REUTERS</div>
-      <div class="e-filing-title">E-FILING MANAGEMENT</div>
-    </div>
-    <div class="header-icons">
-      <button mat-icon-button routerLink="/dashboard">
-        <mat-icon>home</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>description</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>chat</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>help</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>fullscreen</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>notifications</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>info</mat-icon>
-      </button>
-    </div>
-  </div>
+  <nav class="menu">
+    <ul>
+      <li><a routerLink="/dashboard">Dashboard</a></li>
+      <li><a routerLink="/efiling-management">E-Filing Management</a></li>
+      <li><a routerLink="/reports">Reports</a></li>
+      <li>
+        <a routerLink="/returns">Returns</a>
+        <ul class="submenu">
+          <li><a routerLink="/returns/summary">Summary</a></li>
+          <li><a routerLink="/returns/details">Details</a></li>
+          <li><a routerLink="/returns/history">History</a></li>
+          <li><a routerLink="/returns/e-file-updates">E-file Updates</a></li>
+        </ul>
+      </li>
+      <li><a routerLink="/settings">Settings</a></li>
+    </ul>
+  </nav>
 
   <div class="content-wrapper">
     <div class="selection-info" *ngIf="selection.selected.length > 0">
@@ -51,6 +36,7 @@
             <th>Return Name</th>
             <th>Purpose</th>
             <th>Status</th>
+            <th>Efile Status</th>
             <th>No Auto Rollforward</th>
             <th>Start Date</th>
             <th>End Date</th>
@@ -75,6 +61,7 @@
             <td>{{ row.returnName }}</td>
             <td>{{ row.purpose }}</td>
             <td>{{ row.status }}</td>
+            <td>{{ row.efileStatus || 'Not Sent' }}</td>
             <td>{{ row.noAutoRollforward }}</td>
             <td>{{ row.startDate }}</td>
             <td>{{ row.endDate }}</td>

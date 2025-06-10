@@ -24,10 +24,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
-// E-Filing Workflow Components
-import { EfilingWorkflowComponent } from './efiling-workflow/efiling-workflow.component';
-import { ListStepComponent } from './efiling-workflow/list-step/list-step.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+// Removed malformed import statements
 import { PrefillStepComponent } from './efiling-workflow/prefill-step/prefill-step.component';
 import { ValidateStepComponent } from './efiling-workflow/validate-step/validate-step.component';
 import { FileStepComponent } from './efiling-workflow/file-step/file-step.component';
@@ -36,6 +35,11 @@ import { ConfirmationStepComponent } from './efiling-workflow/confirmation-step/
 // Services
 import { WorkflowService } from './services/workflow.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SharedModule } from './shared/shared.module';
+import { EfilingProgressComponent } from './efiling-progress/efiling-progress.component';
+import { EfilingWorkflowComponent } from './efiling-workflow/efiling-workflow.component';
+import { ListStepComponent } from './efiling-workflow/list-step/list-step.component';
+import { EfilingWizardComponent } from './efiling-wizard/efiling-wizard.component';
 
 const materialModules = [
   MatButtonModule,
@@ -47,12 +51,14 @@ const materialModules = [
   MatCheckboxModule,
   MatRadioModule,
   MatProgressSpinnerModule,
+  MatProgressBarModule,
   MatFormFieldModule,
   MatInputModule,
   MatSelectModule,
   MatCardModule,
   MatDividerModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTabsModule
 ];
 
 @NgModule({
@@ -65,7 +71,9 @@ const materialModules = [
     ValidateStepComponent,
     FileStepComponent,
     ConfirmationStepComponent,
-    DashboardComponent
+    DashboardComponent,
+    EfilingProgressComponent,
+    EfilingWizardComponent
   ],
   imports: [
     BrowserModule,
@@ -75,7 +83,8 @@ const materialModules = [
     FormsModule,
     AppRoutingModule,
     AgGridModule.withComponents([]),
-    ...materialModules
+    ...materialModules,
+    SharedModule
   ],
   providers: [WorkflowService],
   bootstrap: [AppComponent]

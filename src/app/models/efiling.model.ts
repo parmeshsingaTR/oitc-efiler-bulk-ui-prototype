@@ -10,7 +10,8 @@ export interface EfilingRecord {
   endDate: string;
   period: string;
   templateVersion: string;
-  eFilingStatus?: string;
+  efileProgress?: string;
+  efileStatus?: string;
   prevEfilingAction?: string;
   templateName?: string;
 }
@@ -25,7 +26,7 @@ export interface ActionMenuItem {
 export const MOCK_DATA: EfilingRecord[] = [
   {
     dataset: 'AL_2193 Dataset 05-2025',
-    jurisdiction: 'Poland',
+    jurisdiction: 'Australia',
     entityName: 'AL_2193',
     returnName: 'AL_2193 Return - 31/05/2025',
     purpose: 'Return',
@@ -34,11 +35,13 @@ export const MOCK_DATA: EfilingRecord[] = [
     startDate: '01/05/2025',
     endDate: '31/05/2025',
     period: '01/05/2025 - 31/05/2025',
-    templateVersion: 'v 12.309'
+    templateVersion: 'v 12.309',
+    efileProgress: '75%',
+    efileStatus: 'Processing'
   },
   {
     dataset: '100ParallelImports_UK_12Apr',
-    jurisdiction: 'United Kingdom',
+    jurisdiction: 'Australia',
     entityName: '100ParallelImports_UK_12Apr',
     returnName: '100ParallelImports_UK_12Apr Return - 31/10/2023',
     purpose: 'Return',
@@ -47,11 +50,13 @@ export const MOCK_DATA: EfilingRecord[] = [
     startDate: '01/10/2023',
     endDate: '31/10/2023',
     period: '01/10/2023 - 31/10/2023',
-    templateVersion: 'v 12.294'
+    templateVersion: 'v 12.294',
+    efileProgress: '50%',
+    efileStatus: 'Pending'
   },
   {
     dataset: '100ParallelImports_UK_26Mar',
-    jurisdiction: 'United Kingdom',
+    jurisdiction: 'Australia',
     entityName: '100ParallelImports_UK_26Mar',
     returnName: '100ParallelImports_UK_26Mar Return - 31/10/2023',
     purpose: 'Return',
@@ -60,11 +65,13 @@ export const MOCK_DATA: EfilingRecord[] = [
     startDate: '01/10/2023',
     endDate: '31/10/2023',
     period: '01/10/2023 - 31/10/2023',
-    templateVersion: 'v 12.294'
+    templateVersion: 'v 12.294',
+    efileProgress: '25%',
+    efileStatus: 'Initiated'
   },
   {
     dataset: 'Income statement 2020-CVQWDDBGAG',
-    jurisdiction: 'United Kingdom',
+    jurisdiction: 'Australia',
     entityName: 'EntUK1-CVQWYBEAD',
     returnName: 'EntUK1-CVQWYBEAD Return - 31/12/2020',
     purpose: 'Return',
@@ -73,11 +80,13 @@ export const MOCK_DATA: EfilingRecord[] = [
     startDate: '01/01/2020',
     endDate: '31/12/2020',
     period: '01/01/2020 - 31/12/2020',
-    templateVersion: 'v 9.242'
+    templateVersion: 'v 9.242',
+    efileProgress: '90%',
+    efileStatus: 'Validating'
   },
   {
     dataset: 'Income statement 2020-CVQCAPFACI',
-    jurisdiction: 'United Kingdom',
+    jurisdiction: 'Australia',
     entityName: 'EntUK1-CVQCEEDFHE',
     returnName: 'EntUK1-CVQCEEDFHE Return - 31/12/2020',
     purpose: 'Return',
@@ -86,7 +95,9 @@ export const MOCK_DATA: EfilingRecord[] = [
     startDate: '01/01/2020',
     endDate: '31/12/2020',
     period: '01/01/2020 - 31/12/2020',
-    templateVersion: 'v 9.242'
+    templateVersion: 'v 9.242',
+    efileProgress: '100%',
+    efileStatus: 'Submitted'
   }
 ];
 
@@ -98,4 +109,8 @@ export const ACTION_MENU_ITEMS: ActionMenuItem[] = [
   { label: 'Delete', action: 'delete', icon: 'delete' },
   { label: 'Print', action: 'print', icon: 'print' },
   { label: 'Force Upgrade', action: 'force-upgrade', icon: 'upgrade' }
+];
+
+export const ACTION_MENU_ITEMS_PROGRESS: ActionMenuItem[] = [
+  { label: 'E-Filing', action: 'e-filing', icon: 'upload_file' },
 ];
