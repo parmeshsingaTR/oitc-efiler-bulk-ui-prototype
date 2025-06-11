@@ -21,30 +21,76 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let record of inProgressRecords">
-              <td class="checkbox-column">
-                <mat-checkbox></mat-checkbox>
-              </td>
-              <td class="actions-column">
-                <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="selectedRow = record">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-              </td>
-              <td class="progress-cell">
-                <mat-progress-bar 
-                  mode="determinate" 
-                  [value]="getProgressValue(record.efileProgress, record.dataset)"
-                  [ngClass]="getProgressBarClass(record.dataset, getProgressValue(record.efileProgress, record.dataset))">
-                </mat-progress-bar>
-              </td>
-              <td>{{ record.efileStatus }}</td>
-              <td>{{ record.dataset }}</td>
-              <td>{{ record.jurisdiction }}</td>
-              <td>{{ record.entityName }}</td>
-              <td>{{ record.returnName }}</td>
-              <td>{{ record.startDate }}</td>
-              <td>{{ record.endDate }}</td>
-            </tr>
+            <!-- Loop through record groups -->
+            <ng-container *ngFor="let group of recordGroups">
+              <!-- Group header row -->
+              <tr class="group-header-row">
+                <td class="checkbox-column">
+                  <mat-checkbox (change)="toggleGroupSelection(group, $event.checked)" 
+                                [disabled]="!hasCompletedRecords(group.records)">
+                  </mat-checkbox>
+                </td>
+                <td colspan="9" class="group-header">
+                  {{ group.name }}
+                </td>
+              </tr>
+              
+              <!-- Records for this group -->
+              <tr *ngFor="let record of group.records">
+                <td class="checkbox-column">
+                  <mat-checkbox *ngIf="isRecordCompleted(record)" 
+                                [checked]="group.selected">
+                  </mat-checkbox>
+                </td>
+                <td class="actions-column">
+                  <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="selectedRow = record">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </td>
+                <td class="progress-cell">
+                  <mat-progress-bar 
+                    mode="determinate" 
+                    [value]="getProgressValue(record.efileProgress, record.dataset)"
+                    [ngClass]="getProgressBarClass(record.dataset, getProgressValue(record.efileProgress, record.dataset))">
+                  </mat-progress-bar>
+                </td>
+                <td>{{ record.efileStatus }}</td>
+                <td>{{ record.dataset }}</td>
+                <td>{{ record.jurisdiction }}</td>
+                <td>{{ record.entityName }}</td>
+                <td>{{ record.returnName }}</td>
+                <td>{{ record.startDate }}</td>
+                <td>{{ record.endDate }}</td>
+              </tr>
+            </ng-container>
+            
+            <!-- Fallback if no groups -->
+            <ng-container *ngIf="recordGroups.length === 0">
+              <tr *ngFor="let record of inProgressRecords">
+                <td class="checkbox-column">
+                  <mat-checkbox *ngIf="isRecordCompleted(record)"></mat-checkbox>
+                </td>
+                <td class="actions-column">
+                  <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="selectedRow = record">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </td>
+                <td class="progress-cell">
+                  <mat-progress-bar 
+                    mode="determinate" 
+                    [value]="getProgressValue(record.efileProgress, record.dataset)"
+                    [ngClass]="getProgressBarClass(record.dataset, getProgressValue(record.efileProgress, record.dataset))">
+                  </mat-progress-bar>
+                </td>
+                <td>{{ record.efileStatus }}</td>
+                <td>{{ record.dataset }}</td>
+                <td>{{ record.jurisdiction }}</td>
+                <td>{{ record.entityName }}</td>
+                <td>{{ record.returnName }}</td>
+                <td>{{ record.startDate }}</td>
+                <td>{{ record.endDate }}</td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>

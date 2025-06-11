@@ -170,10 +170,44 @@
 /* Button styles */
 .button-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-top: auto;
   padding-top: 20px;
+}
+
+/* Ensure buttons always align right and textbox aligns left */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto; /* Push to the right */
+}
+
+/* Context window box styles */
+.context-window-box {
+  display: flex;
+  align-items: center;
+  margin-right: auto; /* Push to the left */
+  
+  .context-label {
+    font-weight: bold;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+  
+  .context-input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 250px;
+    
+    &:focus {
+      outline: none;
+      border-color: #666;
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+  }
 }
 
 .checkbox-container {
@@ -195,10 +229,6 @@
   }
 }
 
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-}
 
 button {
   padding: 8px 16px;
