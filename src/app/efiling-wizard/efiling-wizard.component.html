@@ -53,6 +53,9 @@
       </div>
       
       <div class="button-row">
+        <div class="context-window-box" *ngIf="showContextWindow">
+          <input type="text" class="context-input" [(ngModel)]="contextWindowName" placeholder="Context Window Name">
+        </div>
         <div class="action-buttons">
           <button class="btn-next" (click)="nextStep()">Next</button>
           <button class="btn-cancel" (click)="closeDialog()">Cancel</button>
@@ -69,19 +72,21 @@
       
       <div class="option-row">
         <label class="radio-container">
-          <input type="radio" name="action" [(ngModel)]="selectedAction" value="List" (change)="onActionChange()">
-          <span class="radio-label">Manual (List)</span>
+          <input type="radio" name="action" [(ngModel)]="selectedAction" value="AutoComplete" (change)="onActionChange()">
+          <span class="radio-label">Auto Complete Pending Stages</span>
         </label>
       </div>
-      
       <div class="option-row">
         <label class="radio-container">
-          <input type="radio" name="action" [(ngModel)]="selectedAction" value="AutoComplete" (change)="onActionChange()">
-          <span class="radio-label">Auto Complete</span>
+          <input type="radio" name="action" [(ngModel)]="selectedAction" [value]="getNextAction()" (change)="onActionChange()">
+          <span class="radio-label">Manual ({{ getNextActionLabel() }})</span>
         </label>
-      </div>
+      </div>    
       
       <div class="button-row">
+        <div class="context-window-box" *ngIf="showContextWindow">
+          <input type="text" class="context-input" [(ngModel)]="contextWindowName" placeholder="Context Window Name">
+        </div>
         <div class="action-buttons">
           <button class="btn-prev" (click)="previousStep()">Previous</button>
           <button class="btn-next" (click)="nextStep()">Next</button>
@@ -102,6 +107,9 @@
       </div>
       
       <div class="button-row">
+        <div class="context-window-box" *ngIf="showContextWindow">
+          <input type="text" class="context-input" [(ngModel)]="contextWindowName" placeholder="Context Window Name">
+        </div>
         <div class="action-buttons">
           <button class="btn-refresh" (click)="refreshStatus()">Refresh Status</button>
           <button class="btn-ok" (click)="closeDialog(true)">OK</button>

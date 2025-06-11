@@ -1,11 +1,22 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { EfilingRecord, MOCK_DATA, ACTION_MENU_ITEMS, ACTION_MENU_ITEMS_PROGRESS } from '../models/efiling.model';
+import { formatDate } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { EfilingWizardComponent } from '../efiling-wizard/efiling-wizard.component';
+
+/**
+ * Interface for record groups
+ */
+interface RecordGroup {
+  name: string;
+  records: EfilingRecord[];
+  expanded: boolean;
+  selected?: boolean;
+}
 
 @Component({
   selector: 'app-efiling-progress',
@@ -17,6 +28,9 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
   
   inProgressRecords: EfilingRecord[] = [];
   completedRecords: EfilingRecord[] = [];
+  
+  // Record groups for the e-file updates page
+  recordGroups: RecordGroup[] = [];
   
   // Map to store progress values for each record
   progressValues: Map<string, number> = new Map();
@@ -70,6 +84,9 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
     
     this.completedRecords = MOCK_DATA.filter(record => 
       record.efileProgress === '100%' && record.efileStatus === 'Submitted');
+      
+    // Create record groups for the e-file updates page
+    this.createRecordGroups();
     
     // Initialize progress values, failed status, and stages for each in-progress record
     this.inProgressRecords.forEach(record => {
@@ -86,6 +103,105 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
     
     // Start the progress animation
     this.startProgressAnimation();
+  }
+  
+  /**
+   * Creates record groups for the e-file updates page
+   */
+  createRecordGroups(): void {
+    // Clear existing groups
+    this.recordGroups = [];
+    
+    // Get the current date and time for the first group
+    const currentDateTime = this.getCurrentDateTime();
+    
+    // Create the first group with the first 3 records
+    if (this.inProgressRecords.length > 0) {
+      const firstGroupRecords = this.inProgressRecords.slice(0, 3);
+      this.recordGroups.push({
+        name: `Efile Progress on ${currentDateTime}`,
+        records: firstGroupRecords,
+        expanded: true
+      });
+    }
+    
+    // Create the second group with the last record, using a datetime 1 hour before
+    if (this.inProgressRecords.length > 3) {
+      const lastRecord = this.inProgressRecords.slice(3, 4);
+      const oneHourBeforeDateTime = this.getDateTimeOneHourBefore();
+      this.recordGroups.push({
+        name: `Efile Progress on ${oneHourBeforeDateTime}`,
+        records: lastRecord,
+        expanded: true
+      });
+    }
+  }
+  
+  /**
+   * Gets a date and time string for 1 hour before the current time
+   * @returns Formatted date and time string
+   */
+  getDateTimeOneHourBefore(): string {
+    const date = new Date();
+    date.setHours(date.getHours() - 1);
+    return formatDate(date, 'dd/MM/yyyy HH:mm:ss', 'en-US');
+  }
+  
+  /**
+   * Gets the current date and time formatted as a string
+   * @returns Formatted date and time string
+   */
+  getCurrentDateTime(): string {
+    return formatDate(new Date(), 'dd/MM/yyyy HH:mm:ss', 'en-US');
+  }
+  
+  /**
+   * Toggles the selection of all records in a group
+   * @param group The group to toggle selection for
+   * @param checked Whether the checkbox is checked
+   */
+  toggleGroupSelection(group: RecordGroup, checked: boolean): void {
+    group.selected = checked;
+    
+    // In a real application, you would also update the selection state of all records in the group
+    // For example, if you have a selectedRecords array:
+    // if (checked) {
+    //   this.selectedRecords.push(...group.records.filter(r => this.isRecordCompleted(r)));
+    // } else {
+    //   group.records.forEach(record => {
+    //     if (this.isRecordCompleted(record)) {
+    //       const index = this.selectedRecords.findIndex(r => r.dataset === record.dataset);
+    //       if (index !== -1) {
+    //         this.selectedRecords.splice(index, 1);
+    //       }
+    //     }
+    //   });
+    // }
+    
+    console.log(`Group "${group.name}" selection toggled to ${checked}`);
+  }
+  
+  /**
+   * Checks if a record has completed its progress (successfully or with failure)
+   * @param record The record to check
+   * @returns True if the record has completed (successfully or with failure), false otherwise
+   */
+  isRecordCompleted(record: EfilingRecord): boolean {
+    // Check if the progress is 100% or if the status indicates a failure
+    const progress = this.getProgressValue(record.efileProgress, record.dataset);
+    const isFailedStatus = record.efileStatus === 'Validation Failed';
+    
+    // We want to include both successful and failed records, but only if they're completed
+    return progress === 100 || isFailedStatus;
+  }
+  
+  /**
+   * Checks if a group has any completed records
+   * @param records The records in the group
+   * @returns True if the group has at least one completed record, false otherwise
+   */
+  hasCompletedRecords(records: EfilingRecord[]): boolean {
+    return records.some(record => this.isRecordCompleted(record));
   }
   
   ngOnDestroy(): void {
@@ -124,48 +240,48 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
       const stagesCount = this.efilingStages.length;
       const stepsPerStage = Math.floor(totalSteps / (stagesCount - 1)); // -1 because we start at stage 0
     
-    this.progressSubscription = interval(stepDuration)
-      .pipe(take(totalSteps + 1)) // +1 to reach 100%
-      .subscribe(step => {
-        // Calculate progress percentage (0 to 100)
-        const progressPercentage = step;
-        
-        // Update progress for each in-progress record
-        this.inProgressRecords.forEach(record => {
-          // Update progress value
-          this.progressValues.set(record.dataset, progressPercentage);
+      this.progressSubscription = interval(stepDuration)
+        .pipe(take(totalSteps + 1)) // +1 to reach 100%
+        .subscribe(step => {
+          // Calculate progress percentage (0 to 100)
+          const progressPercentage = step;
           
-          // Calculate current stage based on progress
-          const stageIndex = Math.min(
-            Math.floor(progressPercentage / stepsPerStage),
-            stagesCount - 1
-          );
-          
-          // Update stage if it has changed
-          const currentStageIndex = this.currentStages.get(record.dataset) || 0;
-          if (stageIndex > currentStageIndex) {
-            // Check if this record is marked to fail and we've reached the Validation stage
-            const validationInProgressIndex = this.efilingStages.indexOf('Validation InProgress');
+          // Update progress for each in-progress record
+          this.inProgressRecords.forEach(record => {
+            // Update progress value
+            this.progressValues.set(record.dataset, progressPercentage);
             
-            if (this.isRecordFailed(record.dataset) && stageIndex >= validationInProgressIndex) {
-              // If this is a record that should fail and we've reached the Validation stage,
-              // set the status to "Validation Failed" and don't progress further
-              this.currentStages.set(record.dataset, validationInProgressIndex);
-              record.efileStatus = 'Validation Failed';
+            // Calculate current stage based on progress
+            const stageIndex = Math.min(
+              Math.floor(progressPercentage / stepsPerStage),
+              stagesCount - 1
+            );
+            
+            // Update stage if it has changed
+            const currentStageIndex = this.currentStages.get(record.dataset) || 0;
+            if (stageIndex > currentStageIndex) {
+              // Check if this record is marked to fail and we've reached the Validation stage
+              const validationInProgressIndex = this.efilingStages.indexOf('Validation InProgress');
               
-              // Make the progress bar 100% and red for failed records
-              this.progressValues.set(record.dataset, 100);
-              
-              // Stop further progression for this record
-              return;
-            } else {
-              // For non-failing records, continue with normal progression
-              this.currentStages.set(record.dataset, stageIndex);
-              record.efileStatus = this.efilingStages[stageIndex];
+              if (this.isRecordFailed(record.dataset) && stageIndex >= validationInProgressIndex) {
+                // If this is a record that should fail and we've reached the Validation stage,
+                // set the status to "Validation Failed" and don't progress further
+                this.currentStages.set(record.dataset, validationInProgressIndex);
+                record.efileStatus = 'Validation Failed';
+                
+                // Make the progress bar 100% and red for failed records
+                this.progressValues.set(record.dataset, 100);
+                
+                // Stop further progression for this record
+                return;
+              } else {
+                // For non-failing records, continue with normal progression
+                this.currentStages.set(record.dataset, stageIndex);
+                record.efileStatus = this.efilingStages[stageIndex];
+              }
             }
-          }
+          });
         });
-      });
     } else {
       // For non-auto-complete mode, we'll animate through the specific progression path
       this.inProgressRecords.forEach(record => {

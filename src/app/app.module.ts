@@ -26,6 +26,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatExpansionModule } from '@angular/material/expansion';
 // Removed malformed import statements
 import { PrefillStepComponent } from './efiling-workflow/prefill-step/prefill-step.component';
 import { ValidateStepComponent } from './efiling-workflow/validate-step/validate-step.component';
@@ -58,7 +59,8 @@ const materialModules = [
   MatCardModule,
   MatDividerModule,
   MatTooltipModule,
-  MatTabsModule
+  MatTabsModule,
+  MatExpansionModule
 ];
 
 @NgModule({
