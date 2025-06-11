@@ -99,6 +99,17 @@
         .failed-progress .mat-progress-bar-fill::after {
           background-color: #f44336; // Red for failed progress
         }
+        
+        // Return link styling
+        .return-link {
+          color: #1976d2;
+          text-decoration: none;
+          cursor: pointer;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
       
       // Status styling

@@ -7,6 +7,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EfilingManagementComponent } from './efiling-management/efiling-management.component';
 import { AgGridModule } from 'ag-grid-angular';
+import { CdkTableModule } from '@angular/cdk/table';
+import { CdkTreeModule } from '@angular/cdk/tree';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 // Material Modules
 import { MatButtonModule } from '@angular/material/button';
@@ -60,7 +64,11 @@ const materialModules = [
   MatDividerModule,
   MatTooltipModule,
   MatTabsModule,
-  MatExpansionModule
+  MatExpansionModule,
+  CdkTableModule,
+  CdkTreeModule,
+  DragDropModule,
+  ScrollingModule
 ];
 
 @NgModule({

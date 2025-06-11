@@ -1,7 +1,5 @@
 <div class="efiling-progress-container">
   <h1>E-file Progress</h1>
-  <mat-tab-group>
-    <mat-tab label="In Progress">
       <div class="grid-container">
         <table class="data-table">
           <thead>
@@ -58,7 +56,7 @@
                 <td>{{ record.dataset }}</td>
                 <td>{{ record.jurisdiction }}</td>
                 <td>{{ record.entityName }}</td>
-                <td>{{ record.returnName }}</td>
+                <td><a href="javascript:void(0)" class="return-link">{{ record.returnName }}</a></td>
                 <td>{{ record.startDate }}</td>
                 <td>{{ record.endDate }}</td>
               </tr>
@@ -86,7 +84,7 @@
                 <td>{{ record.dataset }}</td>
                 <td>{{ record.jurisdiction }}</td>
                 <td>{{ record.entityName }}</td>
-                <td>{{ record.returnName }}</td>
+                <td><a href="javascript:void(0)" class="return-link">{{ record.returnName }}</a></td>
                 <td>{{ record.startDate }}</td>
                 <td>{{ record.endDate }}</td>
               </tr>
@@ -94,42 +92,6 @@
           </tbody>
         </table>
       </div>
-    </mat-tab>
-    <mat-tab label="Completed">
-      <div class="grid-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="checkbox-column">
-                <mat-checkbox></mat-checkbox>
-              </th>
-              <th>Efile-status</th>
-              <th>Dataset</th>
-              <th>Jurisdiction</th>
-              <th>Entity Name</th>
-              <th>Return Name</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let record of completedRecords">
-              <td class="checkbox-column">
-                <mat-checkbox></mat-checkbox>
-              </td>
-              <td>{{ record.efileStatus }}</td>
-              <td>{{ record.dataset }}</td>
-              <td>{{ record.jurisdiction }}</td>
-              <td>{{ record.entityName }}</td>
-              <td>{{ record.returnName }}</td>
-              <td>{{ record.startDate }}</td>
-              <td>{{ record.endDate }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
   
   <!-- Action menu -->
   <mat-menu #rowMenu="matMenu">
