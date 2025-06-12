@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { EfilingRecord, MOCK_DATA, ACTION_MENU_ITEMS, ACTION_MENU_ITEMS_PROGRESS } from '../models/efiling.model';
 import { formatDate } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
@@ -18,6 +18,25 @@ interface RecordGroup {
   selected?: boolean;
 }
 
+/**
+ * Interface for filter options
+ */
+interface FilterOption {
+  value: string;
+  selected: boolean;
+}
+
+/**
+ * Interface for column filter
+ */
+interface ColumnFilter {
+  column: string;
+  options: FilterOption[];
+  searchText: string;
+  sortDirection: 'asc' | 'desc' | null;
+  activeTab: 'value' | 'condition';
+}
+
 @Component({
   selector: 'app-efiling-progress',
   templateUrl: './efiling-progress.component.html',
@@ -28,6 +47,10 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
   
   inProgressRecords: EfilingRecord[] = [];
   completedRecords: EfilingRecord[] = [];
+  
+  // Store original unfiltered data
+  originalInProgressRecords: EfilingRecord[] = [];
+  originalRecordGroups: RecordGroup[] = [];
   
   // Record groups for the e-file updates page
   recordGroups: RecordGroup[] = [];
@@ -46,6 +69,19 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
   
   // Selected row for actions
   selectedRow: EfilingRecord | null = null;
+  
+  // Pagination variables
+  currentPage: number = 1;
+  pageSize: number = 100;
+  totalPages: number = 1;
+  
+  // Filter variables
+  activeFilter: ColumnFilter | null = null;
+  filterPosition = { top: '0', left: '0' };
+  showFilter = false;
+  
+  // Element reference for filter container
+  @ViewChild('filterContainer') filterContainer!: ElementRef;
   
   // Array of all possible stages
   efilingStages: string[] = [
@@ -78,15 +114,24 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
       this.autoComplete = params['completion'] === 'auto_complete';
     });
     
+    // Close filter when clicking outside
+    document.addEventListener('click', this.onDocumentClick.bind(this));
+    
     // Filter mock data into in-progress and completed records
     this.inProgressRecords = MOCK_DATA.filter(record => 
       record.efileProgress !== '100%' && record.efileStatus !== 'Submitted');
     
     this.completedRecords = MOCK_DATA.filter(record => 
       record.efileProgress === '100%' && record.efileStatus === 'Submitted');
+    
+    // Store original data for filtering
+    this.originalInProgressRecords = [...this.inProgressRecords];
       
     // Create record groups for the e-file updates page
     this.createRecordGroups();
+    
+    // Store original record groups for filtering
+    this.originalRecordGroups = JSON.parse(JSON.stringify(this.recordGroups));
     
     // Initialize progress values, failed status, and stages for each in-progress record
     this.inProgressRecords.forEach(record => {
@@ -125,16 +170,41 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
       });
     }
     
-    // Create the second group with the last record, using a datetime 1 hour before
-    if (this.inProgressRecords.length > 3) {
-      const lastRecord = this.inProgressRecords.slice(3, 4);
-      const oneHourBeforeDateTime = this.getDateTimeOneHourBefore();
+    // Calculate how many groups we need for the remaining records (approximately 20 records per group)
+    const recordsPerGroup = 20;
+    const remainingRecords = this.inProgressRecords.slice(3);
+    const totalGroups = Math.ceil(remainingRecords.length / recordsPerGroup);
+    
+    // Create groups for the remaining records
+    for (let i = 0; i < totalGroups; i++) {
+      // Calculate the start and end index for this group
+      const startIndex = i * recordsPerGroup;
+      const endIndex = Math.min(startIndex + recordsPerGroup, remainingRecords.length);
+      
+      // Get the records for this group
+      const groupRecords = remainingRecords.slice(startIndex, endIndex);
+      
+      // Calculate a date time for this group (each group is 1 hour before the previous)
+      const groupDateTime = this.getDateTimeHoursBefore(i + 1); // +1 because the first group is at current time
+      
+      // Create the group
       this.recordGroups.push({
-        name: `Efile Progress on ${oneHourBeforeDateTime}`,
-        records: lastRecord,
-        expanded: true
+        name: `Efile Progress on ${groupDateTime}`,
+        records: groupRecords,
+        expanded: false // Only expand the first group by default
       });
     }
+  }
+  
+  /**
+   * Gets a date and time string for a specified number of hours before the current time
+   * @param hours Number of hours to subtract from current time
+   * @returns Formatted date and time string
+   */
+  getDateTimeHoursBefore(hours: number): string {
+    const date = new Date();
+    date.setHours(date.getHours() - hours);
+    return formatDate(date, 'dd/MM/yyyy HH:mm:ss', 'en-US');
   }
   
   /**
@@ -191,6 +261,11 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
     const progress = this.getProgressValue(record.efileProgress, record.dataset);
     const isFailedStatus = record.efileStatus === 'Validation Failed';
     
+    // Don't show checkbox for records with "Efile Completed" status
+    if (record.efileStatus === 'Efile Completed') {
+      return false;
+    }
+    
     // We want to include both successful and failed records, but only if they're completed
     return progress === 100 || isFailedStatus;
   }
@@ -209,6 +284,265 @@ export class EfilingProgressComponent implements OnInit, OnDestroy {
     if (this.progressSubscription) {
       this.progressSubscription.unsubscribe();
     }
+    
+    // Remove document click listener
+    document.removeEventListener('click', this.onDocumentClick.bind(this));
+  }
+  
+  /**
+   * Handles document click to close filter dropdown when clicking outside
+   * @param event Click event
+   */
+  onDocumentClick(event: MouseEvent): void {
+    // If filter is shown and click is outside filter container and not on a filter icon
+    if (
+      this.showFilter && 
+      this.filterContainer && 
+      !this.filterContainer.nativeElement.contains(event.target) &&
+      !(event.target as HTMLElement).closest('.filter-icon')
+    ) {
+      this.showFilter = false;
+    }
+  }
+  
+  /**
+   * Opens the filter dropdown for a specific column
+   * @param column The column to filter
+   * @param event The click event
+   */
+  openFilter(column: string, event: MouseEvent): void {
+    event.stopPropagation(); // Prevent document click from immediately closing the filter
+    
+    // Get unique values for the column
+    const uniqueValues = this.getUniqueColumnValues(column);
+    
+    // Create filter options from unique values
+    const filterOptions: FilterOption[] = uniqueValues.map(value => ({
+      value,
+      selected: true
+    }));
+    
+    // Create or update the active filter
+    this.activeFilter = {
+      column,
+      options: filterOptions,
+      searchText: '',
+      sortDirection: null,
+      activeTab: 'value'
+    };
+    
+    // Calculate position for the filter dropdown
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    this.filterPosition = {
+      top: `${rect.bottom}px`,
+      left: `${rect.left}px`
+    };
+    
+    // Show the filter
+    this.showFilter = true;
+  }
+  
+  /**
+   * Gets unique values for a specific column
+   * @param column The column to get unique values for
+   * @returns Array of unique values
+   */
+  getUniqueColumnValues(column: string): string[] {
+    // Get all records (from groups and individual records)
+    const allRecords: EfilingRecord[] = [
+      ...this.recordGroups.reduce((acc, group) => [...acc, ...group.records], [] as EfilingRecord[]),
+      ...this.inProgressRecords
+    ];
+    
+    // Get unique values for the column
+    const uniqueValues = new Set<string>();
+    allRecords.forEach(record => {
+      if (record[column] !== undefined && record[column] !== null) {
+        uniqueValues.add(record[column].toString());
+      }
+    });
+    
+    return Array.from(uniqueValues);
+  }
+  
+  /**
+   * Checks if all filter options are selected
+   * @returns True if all options are selected, false otherwise
+   */
+  areAllOptionsSelected(): boolean {
+    if (!this.activeFilter) return false;
+    return this.activeFilter.options.every(o => o.selected);
+  }
+  
+  /**
+   * Checks if some (but not all) filter options are selected
+   * @returns True if some options are selected, false otherwise
+   */
+  areSomeOptionsSelected(): boolean {
+    if (!this.activeFilter) return false;
+    return this.activeFilter.options.some(o => o.selected) && !this.activeFilter.options.every(o => o.selected);
+  }
+  
+  /**
+   * Toggles the selection of all filter options
+   * @param selected Whether to select or deselect all options
+   */
+  toggleSelectAll(selected: boolean): void {
+    if (!this.activeFilter) return;
+    
+    this.activeFilter.options.forEach(option => {
+      option.selected = selected;
+    });
+  }
+  
+  /**
+   * Filters the options based on search text
+   * @returns Filtered options
+   */
+  getFilteredOptions(): FilterOption[] {
+    if (!this.activeFilter) return [];
+    
+    if (!this.activeFilter.searchText) {
+      return this.activeFilter.options;
+    }
+    
+    const searchText = this.activeFilter.searchText.toLowerCase();
+    return this.activeFilter.options.filter(option => 
+      option.value.toLowerCase().includes(searchText)
+    );
+  }
+  
+  /**
+   * Applies the current filter
+   */
+  applyFilter(): void {
+    if (!this.activeFilter) return;
+    
+    const column = this.activeFilter.column;
+    const selectedValues = this.activeFilter.options
+      .filter(o => o.selected)
+      .map(o => o.value);
+    
+    console.log('Applying filter for column:', column);
+    console.log('Selected options:', selectedValues);
+    
+    // If all options are selected, no need to filter
+    if (selectedValues.length === this.activeFilter.options.length) {
+      // Reset to original data
+      this.resetToOriginalData();
+    } else {
+      // Filter in-progress records
+      this.inProgressRecords = this.originalInProgressRecords.filter(record => 
+        selectedValues.includes(record[column]?.toString() || '')
+      );
+      
+      // Recreate record groups with filtered data
+      this.createRecordGroups();
+      
+      // Apply sorting if specified
+      if (this.activeFilter.sortDirection) {
+        this.sortData(column, this.activeFilter.sortDirection);
+      }
+    }
+    
+    // Close the filter dropdown
+    this.showFilter = false;
+  }
+  
+  /**
+   * Sorts the data based on the specified column and direction
+   * @param column The column to sort by
+   * @param direction The sort direction ('asc' or 'desc')
+   */
+  sortData(column: string, direction: 'asc' | 'desc'): void {
+    // Sort in-progress records
+    this.inProgressRecords.sort((a, b) => {
+      const valueA = a[column]?.toString() || '';
+      const valueB = b[column]?.toString() || '';
+      
+      if (direction === 'asc') {
+        return valueA.localeCompare(valueB);
+      } else {
+        return valueB.localeCompare(valueA);
+      }
+    });
+    
+    // Sort records within each group
+    this.recordGroups.forEach(group => {
+      group.records.sort((a, b) => {
+        const valueA = a[column]?.toString() || '';
+        const valueB = b[column]?.toString() || '';
+        
+        if (direction === 'asc') {
+          return valueA.localeCompare(valueB);
+        } else {
+          return valueB.localeCompare(valueA);
+        }
+      });
+    });
+  }
+  
+  /**
+   * Resets the data to its original state
+   */
+  resetToOriginalData(): void {
+    // Reset in-progress records
+    this.inProgressRecords = [...this.originalInProgressRecords];
+    
+    // Reset record groups
+    this.recordGroups = JSON.parse(JSON.stringify(this.originalRecordGroups));
+  }
+  
+  /**
+   * Clears the current filter
+   */
+  clearFilter(): void {
+    if (!this.activeFilter) return;
+    
+    // Reset all options to selected
+    this.toggleSelectAll(true);
+    this.activeFilter.searchText = '';
+    this.activeFilter.sortDirection = null;
+    
+    // Reset to original data to show all records
+    this.resetToOriginalData();
+    
+    console.log('Clearing filter for column:', this.activeFilter.column);
+    
+    // Close the filter dropdown
+    this.showFilter = false;
+  }
+  
+  /**
+   * Cancels the current filter operation
+   */
+  cancelFilter(): void {
+    // Simply close the filter dropdown without applying changes
+    this.showFilter = false;
+  }
+  
+  /**
+   * Sets the sort direction for the current column
+   * @param direction The sort direction ('asc' or 'desc')
+   */
+  setSortDirection(direction: 'asc' | 'desc'): void {
+    if (!this.activeFilter) return;
+    
+    this.activeFilter.sortDirection = direction;
+    
+    // In a real application, you would sort the data based on the direction
+    console.log('Sorting column:', this.activeFilter.column, 'Direction:', direction);
+  }
+  
+  /**
+   * Sets the active tab for the filter
+   * @param tab The tab to set active ('value' or 'condition')
+   */
+  setActiveTab(tab: 'value' | 'condition'): void {
+    if (!this.activeFilter) return;
+    
+    this.activeFilter.activeTab = tab;
   }
   
   /**

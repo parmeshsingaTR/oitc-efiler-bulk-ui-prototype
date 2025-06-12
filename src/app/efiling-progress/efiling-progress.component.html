@@ -9,13 +9,48 @@
               </th>
               <th class="actions-column">Actions</th>
               <th>Efie-Progress</th>
-              <th>Efile-status</th>
-              <th>Dataset</th>
-              <th>Jurisdiction</th>
-              <th>Entity Name</th>
-              <th>Return Name</th>
-              <th>Start Date</th>
-              <th>End Date</th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('efileStatus', $event)">
+                  <span>Efile-status</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('dataset', $event)">
+                  <span>Dataset</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('jurisdiction', $event)">
+                  <span>Jurisdiction</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('entityName', $event)">
+                  <span>Entity Name</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('returnName', $event)">
+                  <span>Return Name</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('startDate', $event)">
+                  <span>Start Date</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
+              <th class="filter-header">
+                <div class="header-content" (click)="openFilter('endDate', $event)">
+                  <span>End Date</span>
+                  <mat-icon class="filter-icon">arrow_drop_down</mat-icon>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -92,6 +127,29 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Pagination controls -->
+      <div class="pagination-container">
+        <div class="pagination-controls">
+          <button mat-icon-button class="pagination-button" [disabled]="currentPage === 1">
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button mat-icon-button class="pagination-button" [disabled]="currentPage === 1">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button class="pagination-button" [disabled]="currentPage === totalPages">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+        <div class="page-size-selector">
+          <mat-select [value]="pageSize" class="page-size-select">
+            <mat-option [value]="100">100</mat-option>
+            <mat-option [value]="50">50</mat-option>
+            <mat-option [value]="25">25</mat-option>
+            <mat-option [value]="10">10</mat-option>
+          </mat-select>
+        </div>
+      </div>
   
   <!-- Action menu -->
   <mat-menu #rowMenu="matMenu">
@@ -102,4 +160,66 @@
       </button>
     </ng-template>
   </mat-menu>
+  
+  <!-- Filter dropdown -->
+  <div #filterContainer class="filter-dropdown" *ngIf="showFilter" [style.top]="filterPosition.top" [style.left]="filterPosition.left">
+    <div class="filter-header">
+      <div class="sort-options">
+        <button class="sort-button" [class.active]="activeFilter?.sortDirection === 'asc'" (click)="setSortDirection('asc')">
+          <mat-icon class="sort-icon">arrow_upward</mat-icon> Ascending
+        </button>
+        <button class="sort-button" [class.active]="activeFilter?.sortDirection === 'desc'" (click)="setSortDirection('desc')">
+          <mat-icon class="sort-icon">arrow_downward</mat-icon> Descending
+        </button>
+      </div>
+      
+      <div class="filter-tabs">
+        <div class="tab" [class.active]="activeFilter?.activeTab === 'condition'" (click)="setActiveTab('condition')">
+          Filter by Condition
+        </div>
+        <div class="tab" [class.active]="activeFilter?.activeTab === 'value'" (click)="setActiveTab('value')">
+          Filter by Value
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-content">
+      <!-- Filter by Value content -->
+      <div *ngIf="activeFilter?.activeTab === 'value'">
+        <div class="search-box">
+          <input type="text" placeholder="Search" [(ngModel)]="activeFilter.searchText">
+        </div>
+        
+        <div class="filter-options">
+          <div class="option select-all">
+            <mat-checkbox [checked]="areAllOptionsSelected()" 
+                         [indeterminate]="areSomeOptionsSelected()"
+                         (change)="toggleSelectAll($event.checked)">
+              Select all
+            </mat-checkbox>
+          </div>
+          
+          <div class="option-list">
+            <div class="option" *ngFor="let option of getFilteredOptions()">
+              <mat-checkbox [(ngModel)]="option.selected">
+                {{ option.value }}
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filter by Condition content (placeholder) -->
+      <div *ngIf="activeFilter?.activeTab === 'condition'">
+        <div class="condition-content">
+          <p>Condition filters coming soon...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-actions">
+      <button class="action-button apply" (click)="applyFilter()">Apply</button>
+      <button class="action-button cancel" (click)="cancelFilter()">Cancel</button>
+    </div>
+  </div>
 </div>
